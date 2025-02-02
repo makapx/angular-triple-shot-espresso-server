@@ -44,7 +44,7 @@ app.get("/posts", (req, res) => {
     }
   });
 
-  res.send(pages);
+  res.send(pages.reverse());
 });
 
 // Route for post
