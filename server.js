@@ -48,17 +48,14 @@ app.listen(port, () => {
 
 /**
  * Convert markdown to json
- * 
- * @param {*} filePath 
+ *
+ * @param {*} filePath
  * @returns {*}
  */
 function markdownToJson(filePath) {
   const markdownContent = fs.readFileSync(filePath, "utf-8");
-
-  const htmlContent = marked(markdownContent);
-
   const jsonOutput = {
-    content: htmlContent,
+    content: marked(extractContent(markdownContent)),
     metadata: extractMetadata(markdownContent),
   };
 
@@ -66,9 +63,20 @@ function markdownToJson(filePath) {
 }
 
 /**
+ * Extract content
+ *
+ * @param {*} markdownContent
+ * @returns {*}
+ */
+function extractContent(markdownContent) {
+  const regex = /---[\s\S]*?---\s*/;
+  return markdownContent.replace(regex, "").trim();
+}
+
+/**
  * Extract metadata from file
- * 
- * @param {*} markdownContent 
+ *
+ * @param {*} markdownContent
  * @returns {*}
  */
 function extractMetadata(markdownContent) {
@@ -83,7 +91,14 @@ function extractMetadata(markdownContent) {
     lines.forEach((line) => {
       const [key, value] = line.split(":").map((s) => s.trim());
       if (key && value) {
-        metadata[key] = value;
+        if (value.startsWith("[") && value.endsWith("]")) {
+          const arrayValue = value.slice(1, -1);
+          metadata[key] = arrayValue
+            .split(",")
+            .map((item) => item.trim().replace(/['"]/g, ""));
+        } else {
+          metadata[key] = value.replace(/['"]/g, "");
+        }
       }
     });
   }
