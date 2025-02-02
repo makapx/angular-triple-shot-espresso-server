@@ -29,6 +29,24 @@ app.get("/", (req, res) => {
   });
 });
 
+// Get all posts
+app.get("/posts", (req, res) => {
+  const pages = [];
+  const files = fs.readdirSync(pagesDirectory);
+
+  files.forEach((file) => {
+    if (file.endsWith(".md")) {
+      const filePath = path.join(pagesDirectory, file);
+
+      if (fs.existsSync(filePath)) {
+        pages.push(markdownToJson(filePath));
+      }
+    }
+  });
+
+  res.send(pages);
+});
+
 // Route for post
 app.get("/post/:id", (req, res) => {
   const pageName = req.params.id;
