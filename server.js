@@ -7,6 +7,14 @@ const app = express();
 const port = 3000;
 const pagesDirectory = path.join(__dirname, "pages");
 
+const offensiveWords = [
+  "parolaccia1",
+  "parolaccia2",
+  "parolaccia3",
+  "parolaccia4",
+  "parolaccia5"
+];
+
 app.use(cors());
 
 // Get all posts
@@ -57,6 +65,14 @@ app.get("/post/:id", (req, res) => {
   } else {
     res.status(404).send("Pagina non trovata.");
   }
+});
+
+// Retrive a list of forbidden words
+app.get('/bad-words', (req, res) => {
+  res.json({
+    status: 'success',
+    badWords: offensiveWords
+  });
 });
 
 // Server start
